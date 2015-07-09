@@ -1,6 +1,7 @@
 package com.webpagebytes.authgitkit;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -41,5 +42,28 @@ public void doGet(HttpServletRequest req, HttpServletResponse resp)
 	resp.getOutputStream().write(loginPageContent.getBytes("UTF-8"));
 	resp.getOutputStream().flush();
 }
+
+public void doPost(HttpServletRequest req, HttpServletResponse resp)
+	     throws ServletException, java.io.IOException
+{
+	resp.setContentType("text/html");
+    StringBuilder builder = new StringBuilder();
+    String line;
+    try {
+      while ((line = req.getReader().readLine()) != null) {
+        builder.append(line);
+      }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    
+    String postBody = URLEncoder.encode(builder.toString(), "UTF-8");
+    String content = loginPageContent;
+    content = content.replaceAll("JAVASCRIPT_ESCAPED_POST_BODY", postBody);
+    
+	resp.getOutputStream().write(content.getBytes("UTF-8"));
+	resp.getOutputStream().flush();
+}
+
 
 }

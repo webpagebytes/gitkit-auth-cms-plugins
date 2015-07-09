@@ -1,7 +1,12 @@
 package com.webpagebytes.authgitkit;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+
 import javax.servlet.http.HttpServletRequest;
+
 import com.google.identitytoolkit.GitkitClient;
 import com.google.identitytoolkit.GitkitClientException;
 import com.google.identitytoolkit.GitkitUser;
@@ -17,7 +22,7 @@ public class WPBGitkitAuthentication implements WPBAuthentication {
 	public static final String PROFILE_PAGE_URL = "profilePageUrl";
 	public static final String LOGOUT_PAGE_URL = "logoutPageUrl";
 	public static final String GITKIT_CLIENT_CONFIG_PATH = "gitkitClientConfigPath";
-	
+	public static final String ADMIN_EMAILS = "adminEmails"; 
 	
 	private Map<String, String> configs;
 	private String tokenCookie;
@@ -26,6 +31,7 @@ public class WPBGitkitAuthentication implements WPBAuthentication {
 	private String logoutPageUrl;
 	private String gitkitClientConfigPath;
 	private GitkitClient gitkitClient;
+	private Set<String> adminEmails = new HashSet<String>();
 	
 	@Override
 	public void initialize(Map<String, String> params) throws WPBException {
@@ -55,6 +61,19 @@ public class WPBGitkitAuthentication implements WPBAuthentication {
 			throw new WPBException("Error creating the GitkitClient", e);
 		}
 		
+		String adminEmailsStr = configs.get(ADMIN_EMAILS);
+		if (adminEmailsStr != null)
+		{
+			StringTokenizer tokenizer = new StringTokenizer(adminEmailsStr, ";, ");
+			while (tokenizer.hasMoreElements())
+			{
+				String email = tokenizer.nextToken();
+				if (email.length()>0)
+				{
+					adminEmails.add(email);
+				}
+			}
+		}
 	}
 
 	
@@ -68,7 +87,7 @@ public class WPBGitkitAuthentication implements WPBAuthentication {
 		try
 		{
 			GitkitUser gitkitUser = gitkitClient.validateTokenInRequest(request);
-			if (null != gitkitUser)
+			if (null != gitkitUser && adminEmails.contains(gitkitUser.getEmail()))
 			{
 				result.setUserIdentifier(gitkitUser.getEmail());
 			}
