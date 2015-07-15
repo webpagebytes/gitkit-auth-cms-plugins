@@ -5,6 +5,7 @@
   <artifactId>wpb-auth-gitkit-plugins</artifactId>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
+  <name>wpb-auth-gitkit-plugins</name>
   <description>Authentication plugin for Webpagebytes CMS implemented with Google Identity Toolkit</description>
   <url>http://www.webpagebytes.com</url>
   <licenses>
